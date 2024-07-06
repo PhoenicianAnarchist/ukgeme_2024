@@ -84,10 +84,6 @@ if __name__ == "__main__":
 
         name = element.xpath('a')[0].text
         print(f"Fetching data for : {constituency_id} {name}")
-        if (constituency_id == "S14000094"):
-            print("SKIPPING BECAUSE THEY ARE SLOW")
-            continue
-
         url = f"{domain}{path}"
         json_data[name] = get_constituency_data(
             name, url, constituency_cache_path
