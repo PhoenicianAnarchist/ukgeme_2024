@@ -13,6 +13,23 @@ This script will scrape the election data from the [BBC page][]. There is no
 guarantee that this data will remain available for any length of time, or be
 in a stable format, so this script _will_ stop working at some point.
 
+## ./scripts/list_all.py
+
+This script produces a (large) markdown formatted table showing elected
+candidate, party, and voter turnout for each constituency.
+
+The sorting order can be specified with the `-s` option. The choices for this
+option are `name`, `turnout`, and `share`. The sorting direction can be
+reversed with the `-r` flag.
+
+## ./scripts/tally.py
+
+This script generates a markdown formatted table tallying the number of seats
+for each party.
+
+The sorting order can be specified with the `-s` option. The choices for this
+option are `party`, `seats`. The sorting direction can be reversed with the
+`-r` flag.
 ---
 
 Inspired by an old [CGP Grey video][].
