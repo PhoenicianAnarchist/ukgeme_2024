@@ -22,6 +22,14 @@ The sorting order can be specified with the `-s` option. The choices for this
 option are `name`, `turnout`, and `share`. The sorting direction can be
 reversed with the `-r` flag.
 
+## ./scripts/tally.py
+
+This script generates a markdown formatted table tallying the number of seats
+for each party.
+
+The sorting order can be specified with the `-s` option. The choices for this
+option are `party`, `seats`. The sorting direction can be reversed with the
+`-r` flag.
 ---
 
 Inspired by an old [CGP Grey video][].
