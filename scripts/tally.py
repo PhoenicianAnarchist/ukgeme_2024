@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import argparse
-import pathlib
 import json
 
 import _common
+import _paths
 
 class MergedParty:
     party_1: str
@@ -53,10 +53,21 @@ def print_overall_tally(json_data, args):
     tallied_votes, total_votes = _common.calc_tallied_votes(json_data)
     tallied_seats, total_seats = _common.calc_tallied_seats(json_data)
 
-    name_max_length = max(len(s) for s in tallied_votes.keys())
-    header_fmtstr = f"{{:<{name_max_length}}} | {{:>8}} | {{:>5}} | {{:>10}}"
-    row_fmtstr = f"{{name:<{name_max_length}}} | {{votes:>8}} | {{seats:>5}} | {{vps:>10}}"
-    hr = _common.build_hr((name_max_length, 8, 5, 10), ("<", ">", ">", ">"))
+    headers = ("Party Name", "Votes", "Seats", "Votes/Seat")
+    max_lengths = (
+        _common.get_max_column_width(headers[0], tallied_votes.keys()),
+        _common.get_max_column_width(
+            headers[1], (str(x["vote_count"]) for x in tallied_votes.values())
+        ),
+        _common.get_max_column_width(
+            headers[2], (str(x["seat_count"]) for x in tallied_seats.values())
+        ),
+        len(headers[3]) # good enough
+    )
+
+    header_fmtstr = _common.build_row_fmtstr(max_lengths, ("<", "<", "<", "<"))
+    row_fmtstr    = _common.build_row_fmtstr(max_lengths, ("<", ">", ">", ">"))
+    hr_str        = _common.build_hr_str(    max_lengths, ("<", ">", ">", ">"))
 
     tallies = {}
     for party, votes in tallied_votes.items():
@@ -74,8 +85,8 @@ def print_overall_tally(json_data, args):
 
         tallies[party] = (votes, seats, vps)
 
-    print(header_fmtstr.format("Party Name", "Votes", "Seats", "Votes/Seat"))
-    print(hr)
+    print(header_fmtstr.format(*headers))
+    print(hr_str)
 
     if args.sort == "name":
         tallies = {
@@ -107,7 +118,7 @@ def print_overall_tally(json_data, args):
         }
 
     for party, (votes, seats, vps) in tallies.items():
-        print(row_fmtstr.format(name=party, votes=votes, seats=seats, vps=vps))
+        print(row_fmtstr.format(party, votes, seats, vps))
 
 ## Argument Parser ############################################################
 parser = argparse.ArgumentParser()
@@ -131,8 +142,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 ## Load Data ##################################################################
-json_data_path = pathlib.Path("./data/bbc2024.json")
-with open(json_data_path, "r") as f:
+with open(_paths.json_data_path, "r") as f:
     json_data = json.load(f)
 
 ## Main #######################################################################
