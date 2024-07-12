@@ -30,6 +30,22 @@ for each party.
 The sorting order can be specified with the `-s` option. The choices for this
 option are `party`, `seats`. The sorting direction can be reversed with the
 `-r` flag.
+
+### Splitting the Voter Base
+
+One of the reasons that I chose to write these scripts is to examine the idea
+of the "right wing" being split between `Conservative` and `Reform UK` being
+the cause of `Labour`'s "victory".
+
+Due to how the voting system works, this is not as simple as adding the number
+of each seats for each party.
+
+The `--groups` option can be given an arbitrary number of groupings in the
+format of `<Party1>,<Party2>,<NewName>`, (e.g. `Conservative,Reform UK,REFCON`)
+to automatically merge the vote count of the two parties in each constituency.
+
+Data from a single constituency can be shown with the `--constituency` option.
+
 ---
 
 Inspired by an old [CGP Grey video][].
