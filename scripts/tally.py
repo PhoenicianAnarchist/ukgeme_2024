@@ -3,62 +3,87 @@ import argparse
 import pathlib
 import json
 
-def get_elected_party(results):
-    party = ""
+import _common
 
-    # scorecards should be in order of highest votes to lowest, check anyway
-    count = 0
-    for scorecard in results["scorecards"]:
-        if scorecard["vote_count"] <= count:
-            continue
+def print_overall_tally(json_data, args):
+    tallied_votes, total_votes = _common.calc_tallied_votes(json_data)
+    tallied_seats, total_seats = _common.calc_tallied_seats(json_data)
 
-        party = scorecard["party"]
-        count = scorecard["vote_count"]
+    name_max_length = max(len(s) for s in tallied_votes.keys())
+    header_fmtstr = f"{{:<{name_max_length}}} | {{:>7}} | {{:>5}} | {{:>10}}"
+    row_fmtstr = f"{{name:<{name_max_length}}} | {{votes:>7}} | {{seats:>5}} | {{vps:>10}}"
+    hr = _common.build_hr((name_max_length, 7, 5, 10), ("<", ">", ">", ">"))
 
-    return party
+    tallies = {}
+    for party, votes in tallied_votes.items():
+        votes = votes["vote_count"]
+        seats = 0
+        vps = "N/A"
+        try:
+            seats = tallied_seats[party]["seat_count"]
+            vps = int(votes / seats)
+        except KeyError:
+            if (args.ignore_zero):
+                continue
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-s", "--sort", choices=["party", "seats"], default="party"
-    )
-    parser.add_argument("-r", "--reverse", action="store_true")
+            pass
 
-    args = parser.parse_args()
+        tallies[party] = (votes, seats, vps)
 
-    json_data_path = pathlib.Path("./data/bbc2024.json")
+    print(header_fmtstr.format("Party Name", "Votes", "Seats", "Votes/Seat"))
+    print(hr)
 
-    with open(json_data_path, "r") as f:
-        json_data = json.load(f)
-
-    max_width = 0
-    parties = {}
-    for constituency, results in json_data.items():
-        party = get_elected_party(results)
-
-        if party not in parties:
-            w = len(party)
-            if w > max_width:
-                max_width = w
-
-            parties[party] = 0
-
-        parties[party] += 1
-
-    if args.sort == "party":
-        parties = {
+    if args.sort == "name":
+        tallies = {
             k: v for k, v in sorted(
-                parties.items(), reverse=args.reverse, key=lambda x: x[0]
+                tallies.items(), reverse=args.reverse,
+                key=lambda x: x[0]
+            )
+        }
+    elif args.sort == "votes":
+        tallies = {
+            k: v for k, v in sorted(
+                tallies.items(), reverse=not args.reverse,
+                key=lambda x: x[1][0]
             )
         }
     elif args.sort == "seats":
-        parties = {
+        tallies = {
             k: v for k, v in sorted(
-                parties.items(), reverse=args.reverse, key=lambda x: x[1]
+                tallies.items(), reverse=not args.reverse,
+                key=lambda x: x[1][1]
+            )
+        }
+    elif args.sort == "vps":
+        tallies = {
+            k: v for k, v in sorted(
+                tallies.items(), reverse=not args.reverse,
+                key=lambda x: x[1][2] if x[1][2] != "N/A" else 0
             )
         }
 
-    print("{:<{w}} | {:>5}".format("Party", "Seats", w = max_width))
-    print(":{:-<{w}}-|-{:->4}:".format("-", "-", w = (max_width - 1)))
-    for party, seats in parties.items():
-        print(f"{party:<{max_width}} | {seats:>5}")
+    for party, (votes, seats, vps) in tallies.items():
+        print(row_fmtstr.format(name=party, votes=votes, seats=seats, vps=vps))
+
+
+## Argument Parser ############################################################
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-s", "--sort", choices=["name", "votes", "seats", "vps"], default="name"
+)
+parser.add_argument("-r", "--reverse", action="store_true")
+parser.add_argument(
+    "-z", "--ignore-zero", action="store_true",
+    help="Ignore parties with zero seats"
+)
+
+args = parser.parse_args()
+
+## Load Data ##################################################################
+json_data_path = pathlib.Path("./data/bbc2024.json")
+with open(json_data_path, "r") as f:
+    json_data = json.load(f)
+
+## Main #######################################################################
+print_overall_tally(json_data, args)
+exit(0)
