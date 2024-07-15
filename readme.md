@@ -19,7 +19,7 @@ This script produces a (large) markdown formatted table showing elected
 candidate, party, and voter turnout for each constituency.
 
 The sorting order can be specified with the `-s` option. The choices for this
-option are `name`, `turnout`, and `share`. The sorting direction can be
+option are `party`, `turnout`, and `share`. The sorting direction can be
 reversed with the `-r` flag.
 
 ## ./scripts/tally.py
