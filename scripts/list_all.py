@@ -71,18 +71,12 @@ def print_table(json_data, args):
     print(header_fmtstr.format(*column_headers))
     print(hr_str)
 
-    if args.sort == "party":
-        rows = sorted(
-            rows, key=lambda x: x[0], reverse=args.reverse
-        )
+    if args.sort == "name":
+        rows = sorted(rows, key=lambda x: x[0], reverse=args.reverse)
     elif args.sort == "turnout":
-        rows = sorted(
-            rows, key=lambda x: x[2], reverse=not args.reverse
-        )
+        rows = sorted(rows, key=lambda x: x[2], reverse=not args.reverse)
     elif args.sort == "share":
-        rows = sorted(
-            rows, key=lambda x: x[6], reverse=not args.reverse
-        )
+        rows = sorted(rows, key=lambda x: x[6], reverse=not args.reverse)
 
     for row in rows:
         print(row_fmtstr.format(*row))
@@ -90,11 +84,11 @@ def print_table(json_data, args):
 ## Argument Parser ############################################################
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-s", "--sort", choices=["party", "turnout", "share"], default="party"
+    "-s", "--sort", choices=["name", "turnout", "share"], default="name"
 )
 parser.add_argument("-r", "--reverse", action="store_true")
 parser.add_argument(
-    "-c", "--constituency", nargs="?",
+    "-c", "--constituency", nargs=1,
     help="show results for a single constituency"
 )
 args = parser.parse_args()
@@ -109,6 +103,6 @@ if args.constituency is None:
     print_table(json_data, args)
 else:
     print_table(
-        {args.constituency: json_data[args.constituency]},
+        {args.constituency[0]: json_data[args.constituency[0]]},
         args
     )

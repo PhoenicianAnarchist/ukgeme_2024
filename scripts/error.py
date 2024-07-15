@@ -113,13 +113,15 @@ def print_error_x(tallied_error, total_error, h, f, average_total=False):
     if args.sort == "name":
         tallied_error = {
             k: v for k, v in sorted(
-                tallied_error.items(), reverse=args.reverse, key=lambda x: x[0]
+                tallied_error.items(), key=lambda x: x[0],
+                reverse=args.reverse
             )
         }
     elif args.sort == "error":
         tallied_error = {
             k: v for k, v in sorted(
-                tallied_error.items(), reverse=args.reverse, key=lambda x: x[1]
+                tallied_error.items(), key=lambda x: x[1],
+                reverse=not args.reverse
             )
         }
 
@@ -138,7 +140,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--sort", choices=["name", "error"], default="name")
 parser.add_argument("-r", "--reverse", action="store_true")
 parser.add_argument(
-    "-c", "--constituency", action="store_true",
+    "-c", "--constituency", nargs="*",
     help="Show error per constituency instead of overall error"
 )
 
@@ -149,7 +151,12 @@ with open(_paths.json_data_path, "r") as f:
     json_data = json.load(f)
 
 ## Main #######################################################################
-if args.constituency:
+if args.constituency is None:
+    print_overall_error(json_data, args)
+elif len(args.constituency) == 0:
     print_per_constituency(json_data, args)
 else:
-    print_overall_error(json_data, args)
+    print_overall_error(
+        {args.constituency[0]: json_data[args.constituency[0]]},
+        args
+    )

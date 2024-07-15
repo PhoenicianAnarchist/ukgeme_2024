@@ -6,12 +6,9 @@ import _common
 import _paths
 
 class MergedParty:
-    party_1: str
-    party_2: str
-    new_name: str
-
     def __init__(self, s):
-        self.party_1, self.party_2, self.new_name = s.split(",")
+        stripped = (x.strip() for x in s.split(","))
+        self.party_1, self.party_2, self.new_name = stripped
 
     def __str__(self):
         return " ".join((self.party_1, "+", self.party_2, "=", self.new_name))
@@ -127,16 +124,16 @@ parser.add_argument(
 )
 parser.add_argument("-r", "--reverse", action="store_true")
 parser.add_argument(
+    "-c", "--constituency", nargs=1,
+    help="show results for a single constituency, useful with --groups"
+)
+parser.add_argument(
     "-z", "--ignore-zero", action="store_true",
     help="Ignore parties with zero seats"
 )
 parser.add_argument(
     "-g", "--groups", type=MergedParty, action="append",
     help="any number of groupings in the form of `<Party1>,<Party2>,<NewName>`"
-)
-parser.add_argument(
-    "-c", "--constituency", nargs="?",
-    help="show results for a single constituency, useful with --groups"
 )
 
 args = parser.parse_args()
@@ -153,6 +150,6 @@ if args.constituency is None:
     print_overall_tally(json_data, args)
 else:
     print_overall_tally(
-        {args.constituency: json_data[args.constituency]},
+        {args.constituency[0]: json_data[args.constituency[0]]},
         args
     )
