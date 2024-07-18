@@ -4,6 +4,8 @@ import requests
 import lxml.etree
 import json
 
+import _paths
+
 def get_cached(url, filepath, force_refresh=False):
     if filepath.is_file() and (not force_refresh):
         return filepath
@@ -65,11 +67,7 @@ def get_scorecard_data(scorecard):
 if __name__ == "__main__":
     domain = "https://www.bbc.co.uk/"
     url = f"{domain}/news/election/2024/uk/constituencies"
-    web_cache_path = pathlib.Path("./cache/bbc2024.html")
-    json_data_path = pathlib.Path("./data/bbc2024.json")
-
-    web_cache_path = get_cached(url, web_cache_path)
-    tree = lxml.etree.parse(web_cache_path, lxml.etree.HTMLParser())
+    tree = lxml.etree.parse(_paths.web_cache_path, lxml.etree.HTMLParser())
 
     elements = tree.xpath('//div[@class="ssrcss-u3oqoy-Callout ewuptu24"]')
 
@@ -89,9 +87,10 @@ if __name__ == "__main__":
             name, url, constituency_cache_path
         )
 
-    json_data_dir = json_data_path.parent
+    json_data_dir = _paths.json_data_path.parent
     if (not json_data_dir.exists()):
         json_data_dir.mkdir(parents=True)
 
-    with open(json_data_path, "w") as f:
+    with open(_paths.json_data_path, "w") as f:
         json.dump(json_data, f, indent=2, sort_keys=True)
+        f.write("\n") # add trailing newline

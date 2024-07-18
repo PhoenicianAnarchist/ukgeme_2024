@@ -57,7 +57,7 @@ def calc_tallied_seats(json_data):
 
     return tallied_seats, total_seats
 
-def build_hr(widths, alignments):
+def build_hr_str(widths, alignments):
     hr_str = ""
     last_col = len(widths) - 1
 
@@ -82,3 +82,20 @@ def build_hr(widths, alignments):
             hr_str += "|"
 
     return hr_str
+
+def build_row_fmtstr(widths, alignments, types=None):
+    row_fmtstr = ""
+    last_col = len(widths) - 1
+
+    for i, w in enumerate(widths):
+        a = alignments[i]
+        t = types[i] if types is not None else ""
+        row_fmtstr += f"{{:{a}{w}{t}}}"
+
+        if i != last_col:
+            row_fmtstr += " | "
+
+    return row_fmtstr
+
+def get_max_column_width(header, row_data):
+    return max(max(len(s) for s in row_data), len(header))
