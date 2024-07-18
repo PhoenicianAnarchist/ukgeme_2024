@@ -67,6 +67,12 @@ Sorting options:
 - `name`
 - `turnout`
 - `share`
+- `majority`
+
+Other options:
+
+- `-p`, `--majority-percentage`
+: calculate the majority as a percentage of overall votes
 
 ### ./scripts/tally.py
 
@@ -89,15 +95,6 @@ Other options:
 : Groups the votes for two parties as if they were one, and renames it. e.g.
 `-g "Party One, Party Two, New Party"` will group `Party One` and `Party Two`
 votes under the name `New Party`.
-
-#### Splitting the Voter Base
-
-One of the reasons that I chose to write these scripts is to examine the idea
-of the "right wing" being split between `Conservative` and `Reform UK` being
-the cause of `Labour`'s "victory".
-
-Due to how the voting system works, this is not as simple as adding the number
-of each seats for each party.
 
 ---
 
